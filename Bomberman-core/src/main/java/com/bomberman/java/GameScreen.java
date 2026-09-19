@@ -1,0 +1,92 @@
+package com.bomberman.java;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.ScreenUtils;
+
+public class GameScreen implements Screen{
+	final Bomberman game;
+	
+	public TiledMap map;
+	public OrthogonalTiledMapRenderer mapRenderer;
+	float unitScale;
+	
+	public GameScreen(final Bomberman game) {
+		this.game = game;
+		unitScale = (1f / 128f);
+	}
+
+	@Override
+	public void show() {
+		// TODO Auto-generated method stub
+		map = new TmxMapLoader().load("starter_map.tmx");
+		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale);
+		
+		float worldWidth = map.getProperties().get("width", Integer.class) * map.getProperties().get("tilewidth", Integer.class) * unitScale;
+		float worldHeight = map.getProperties().get("height", Integer.class) * map.getProperties().get("tileheight", Integer.class) * unitScale;
+		game.camera.position.set(worldWidth / 2f, worldHeight / 2f, 0);
+	}
+	
+	public void draw() {
+		ScreenUtils.clear(Color.CYAN);
+		mapRenderer.render();
+		
+		game.batch.begin();
+		// draw objects here
+		
+		game.batch.end();
+	}
+	
+	public void logic() {
+		// anything logic that needs to constantly be rendered goes here
+		game.camera.update();
+		mapRenderer.setView(game.camera);
+	}
+	
+	public void input(float delta) {
+		// anything relating to input goes here
+	}
+
+	@Override
+	public void render(float delta) {
+		// TODO Auto-generated method stub
+		input(delta);
+		logic();
+		draw();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		// TODO Auto-generated method stub
+		game.viewport.update(width, height, true);
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void hide() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		map.dispose();
+	}
+
+}
