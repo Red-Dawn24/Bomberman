@@ -6,3 +6,6 @@ plugins {
 // You can remove Strings from the list and reload the Gradle project
 // if you want to temporarily disable a subproject.
 include 'lwjgl3', 'core'
+
+project(':core').projectDir = file('../Bomberman-core')
+project(':lwjgl3').projectDir = file('../Bomberman-lwjgl3')
