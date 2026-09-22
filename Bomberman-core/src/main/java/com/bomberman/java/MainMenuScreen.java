@@ -21,7 +21,7 @@ public class MainMenuScreen implements Screen{
 		
 		game.viewport.apply();
 		
-		//
+		// tell batch to use viewport to draw
 		game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
 		
 		// Initialize sprite batch
@@ -32,6 +32,7 @@ public class MainMenuScreen implements Screen{
 		// End sprite batch
 		game.batch.end();
 		
+		// if clicked or pressed
 		if (Gdx.input.isTouched()) {
 			game.setScreen(new GameScreen(game));
 			dispose();

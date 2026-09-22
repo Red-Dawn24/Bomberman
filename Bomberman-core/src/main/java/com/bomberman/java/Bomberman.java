@@ -16,6 +16,8 @@ public class Bomberman extends Game {
     public FitViewport viewport;
     public BitmapFont font;
     public OrthographicCamera camera;
+    public float worldWidth;
+    public float worldHeight;
     
     public void create() {
     	// Sprite Batch to render all images at once for performance
@@ -27,9 +29,18 @@ public class Bomberman extends Game {
     	// Font to be able to draw text to screen
     	font = new BitmapFont();
     	
+    	// setting world width / height in game units (16x16 = 1 unit)
+    	// map is 20x20 tiles with each tile being 16x16
+    	worldWidth = 20;
+    	worldHeight = 20;
+    	
     	// Camera to render map
     	camera = new OrthographicCamera();
-    	camera.setToOrtho(false, viewport.getWorldWidth(), viewport.getWorldHeight());
+    	// Use position 20, 20 as in game units (16x16 = 1 unit)
+    	camera.setToOrtho(false, worldWidth, worldHeight);
+    	// set camera to middle of map
+    	camera.position.set(10, 10, 0);
+    	camera.update();
     	
     	// Settings for font to set their scale relative to screen size
     	font.setUseIntegerPositions(false);
@@ -40,7 +51,7 @@ public class Bomberman extends Game {
     }
     
     public void render() {
-    	
+    	// use render method from game class (important)
     	super.render();
     }
     
