@@ -57,7 +57,7 @@ public class Enemy {
 		}
 		
 		// Access tile layer
-		TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Tile Layer 1");
+		TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Walls");
 		TiledMapTileLayer.Cell cell = layer.getCell(nextX, nextY);
 		
 		// check if cell / tile is valid
