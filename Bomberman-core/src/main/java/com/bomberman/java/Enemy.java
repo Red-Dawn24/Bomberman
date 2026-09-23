@@ -93,6 +93,10 @@ public class Enemy {
 		sprite.setPosition(enemyX, enemyY);
 	}
 	
+	public void checkHitbox(Rectangle playerRec){
+		
+	}
+	
 	// move enemy back and forth on x axis
 	public void move(float delta) {
 		enemyX += speed * delta;

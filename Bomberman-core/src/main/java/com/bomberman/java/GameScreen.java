@@ -29,7 +29,7 @@ public class GameScreen implements Screen{
 	@Override
 	public void show() {
 		// Load map and map renderer
-		map = new TmxMapLoader().load("starter_map.tmx");
+		map = new TmxMapLoader().load("FirstMap.tmx");
 		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale);
 		
 		//float worldWidth = map.getProperties().get("width", Integer.class) * map.getProperties().get("tilewidth", Integer.class) * unitScale;
