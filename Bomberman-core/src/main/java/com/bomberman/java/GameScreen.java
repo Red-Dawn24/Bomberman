@@ -17,6 +17,7 @@ public class GameScreen implements Screen{
 	float unitScale;
 	Texture ghostTexture;
 	Enemy ghost;
+	Player player1 = new Player(0, 0);
 	
 	public GameScreen(final Bomberman game) {
 		this.game = game;
@@ -24,6 +25,7 @@ public class GameScreen implements Screen{
 		unitScale = (1f / 16f);
 		ghostTexture = new Texture("ghost.png");
 		ghost = new Enemy(ghostTexture);
+		
 	}
 
 	@Override
@@ -31,7 +33,6 @@ public class GameScreen implements Screen{
 		// Load map and map renderer
 		map = new TmxMapLoader().load("FirstMap.tmx");
 		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale);
-		
 		//float worldWidth = map.getProperties().get("width", Integer.class) * map.getProperties().get("tilewidth", Integer.class) * unitScale;
 		//float worldHeight = map.getProperties().get("height", Integer.class) * map.getProperties().get("tileheight", Integer.class) * unitScale;
 		//game.camera.position.set(worldWidth / 2f, worldHeight / 2f, 0);
@@ -47,6 +48,7 @@ public class GameScreen implements Screen{
 		
 		game.batch.begin();
 		// draw objects here
+		player1.render(game.batch);
 		ghost.draw(game.batch);
 		
 		game.batch.end();
@@ -56,6 +58,7 @@ public class GameScreen implements Screen{
 		// anything logic that needs to constantly be rendered goes here
 		game.camera.update();
 		mapRenderer.setView(game.camera);
+		player1.update(delta);
 		ghost.logic(delta);
 	}
 	
