@@ -58,8 +58,8 @@ public class GameScreen implements Screen{
 		// anything logic that needs to constantly be rendered goes here
 		game.camera.update();
 		mapRenderer.setView(game.camera);
+		ghost.logic(delta, map);
 		player1.update(delta);
-		ghost.logic(delta);
 	}
 	
 	public void input(float delta) {
