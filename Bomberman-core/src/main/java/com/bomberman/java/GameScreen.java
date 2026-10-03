@@ -1,12 +1,14 @@
 package com.bomberman.java;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameScreen implements Screen{
@@ -18,6 +20,7 @@ public class GameScreen implements Screen{
 	Texture ghostTexture;
 	Enemy ghost;
 	Player player1 = new Player(0, 0);
+	Array<Bomb> bombs;
 	
 	public GameScreen(final Bomberman game) {
 		this.game = game;
@@ -25,7 +28,7 @@ public class GameScreen implements Screen{
 		unitScale = (1f / 16f);
 		ghostTexture = new Texture("ghost.png");
 		ghost = new Enemy(ghostTexture);
-		
+		bombs = new Array<>();
 	}
 
 	@Override
@@ -50,6 +53,9 @@ public class GameScreen implements Screen{
 		// draw objects here
 		player1.render(game.batch);
 		ghost.draw(game.batch);
+		for (Bomb bomb : bombs) {
+			bomb.draw(game.batch);
+		}
 		
 		game.batch.end();
 	}
@@ -58,12 +64,24 @@ public class GameScreen implements Screen{
 		// anything logic that needs to constantly be rendered goes here
 		game.camera.update();
 		mapRenderer.setView(game.camera);
+		for (int i = bombs.size - 1; i >= 0; i--) {
+			Bomb bomb = bombs.get(i);
+			bomb.logic(delta);
+			
+			if (!bomb.bombTimerStart) {
+				bombs.removeIndex(i);
+			}
+		}
 		ghost.logic(delta, map);
 		player1.update(delta);
 	}
 	
 	public void input(float delta) {
 		// anything relating to input goes here
+		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            Bomb bomb = new Bomb((int)(player1.x), (int)(player1.y));
+            bombs.add(bomb);
+		}
 	}
 
 	@Override

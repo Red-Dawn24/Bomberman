@@ -50,7 +50,7 @@ public class Enemy {
 		enemyWidth = 1f;
 		enemyHeight = 1f;
 		enemyX = 1f;
-		enemyY = 11f;
+		enemyY = 19f;
 		rectangle = new Rectangle();
 		// fast speeds can break the movement !!!
 		speed = 3f;
@@ -139,8 +139,11 @@ public class Enemy {
 		}
 	}
 	
+	//
 	public void checkHitbox(Rectangle playerRec){
-		
+		if (playerRec.overlaps(rectangle)) {
+			
+		}
 	}
 	
 	public void move(float delta) {
