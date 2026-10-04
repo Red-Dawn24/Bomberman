@@ -64,6 +64,7 @@ public class GameScreen implements Screen{
 		// anything logic that needs to constantly be rendered goes here
 		game.camera.update();
 		mapRenderer.setView(game.camera);
+		mapRenderer.render();
 		for (int i = bombs.size - 1; i >= 0; i--) {
 			Bomb bomb = bombs.get(i);
 			bomb.logic(delta);
@@ -79,7 +80,7 @@ public class GameScreen implements Screen{
 	public void input(float delta) {
 		// anything relating to input goes here
 		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            Bomb bomb = new Bomb((int)(player1.x), (int)(player1.y));
+            Bomb bomb = new Bomb(map, (int)(player1.x), (int)(player1.y));
             bombs.add(bomb);
 		}
 	}

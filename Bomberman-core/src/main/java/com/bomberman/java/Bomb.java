@@ -14,6 +14,13 @@ import com.badlogic.gdx.utils.Array;
 
 
 public class Bomb {
+	final static int[][] BOMB_DIRECTIONS = {
+			{0, 1},
+			{0, -1},
+			{1, 0},
+			{-1, 0}
+	};
+	TiledMap map;
 	int bombX;
 	int bombY;
 	boolean bombTimerStart;
@@ -21,11 +28,10 @@ public class Bomb {
 	int bombRadius;
 	float bombWidth;
 	float bombHeight;
-	
 	Texture texture;
 	Sprite sprite;
 	
-	public Bomb(int x, int y) {
+	public Bomb(TiledMap map, int x, int y) {
 		bombTimer = 0;
 		bombRadius = 1;
 		bombX = x;
@@ -35,6 +41,7 @@ public class Bomb {
 		texture = new Texture("bomb.png");
 		sprite = new Sprite(texture);
 		sprite.setSize(bombWidth, bombHeight);
+		this.map = map;
 		
 		spawnBomb();
 	}
@@ -48,7 +55,7 @@ public class Bomb {
 	// adds delta to bombTimer, when it reaches 3 or more, bombExplode is activated
 	public void bombTimerManager(float delta) {
 		if (bombTimer >= 3) {
-			bombExplode();
+			bombExplode(map);
 			return;
 		}
 		bombTimer += delta;
@@ -56,8 +63,40 @@ public class Bomb {
 	}
 	
 	// for now, it simply sets timer to false, which then gets deleted in gamescreen
-	public void bombExplode() {
+	public void bombExplode(TiledMap map) {
+		for (int i = 0; i < BOMB_DIRECTIONS.length; i++) {
+			// get direction x and y and iterate through each one
+			int nextX = bombX + BOMB_DIRECTIONS[i][0];
+			int nextY = bombY + BOMB_DIRECTIONS[i][1];
+			
+			if (isBrick(map, nextX, nextY)) {
+				breakBrick(map, nextX, nextY);
+			}
+		}
 		bombTimerStart = false;
+	}
+	
+	public boolean isBrick(TiledMap map, int x, int y) {
+		for (MapLayer layer : map.getLayers()) {
+			if (!(layer instanceof TiledMapTileLayer)) {
+				continue;
+			}
+			
+			TiledMapTileLayer tileLayer = (TiledMapTileLayer) layer;
+			TiledMapTileLayer.Cell cell = tileLayer.getCell(x, y);
+			
+			// if layer is not floor and cell exists in that layer, return false
+			if (cell != null && cell.getTile() != null && tileLayer.getName().equals("Bricks")) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public void breakBrick(TiledMap map, int nextX, int nextY) {
+		TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Bricks");
+		layer.setCell(nextX, nextY, null);
 	}
 	
 	public void draw(SpriteBatch batch) {
