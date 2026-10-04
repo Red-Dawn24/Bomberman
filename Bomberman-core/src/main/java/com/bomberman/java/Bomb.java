@@ -1,5 +1,8 @@
 package com.bomberman.java;
 
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,6 +17,7 @@ import com.badlogic.gdx.utils.Array;
 
 
 public class Bomb {
+	// bomb only goes 4 directions
 	final static int[][] BOMB_DIRECTIONS = {
 			{0, 1},
 			{0, -1},
@@ -21,17 +25,23 @@ public class Bomb {
 			{-1, 0}
 	};
 	TiledMap map;
+	// bomb pos on map
 	int bombX;
 	int bombY;
 	
+	// bomb variables for timer and if its active
 	boolean bombTimerStart;
 	float bombTimer;
+	
+	// radius, change it to make bomb go further or less distance
 	int bombRadius;
 	
+	// will be used to show bomb explosion tiles for a second
 	boolean bombExplosion;
 	float bombExplosionTimer;
-	// temporary layer for collision purposes
-	TiledMapTileLayer bombLayer;
+	
+	// if true, explosion will go through soft blocks
+	boolean bombPower;
 	
 	float bombWidth;
 	float bombHeight;
@@ -40,7 +50,8 @@ public class Bomb {
 	
 	public Bomb(TiledMap map, int x, int y) {
 		bombTimer = 0;
-		bombRadius = 0;
+		bombRadius = 2;
+		bombPower = false;
 		bombX = x;
 		bombY = y;
 		bombWidth = 1;
@@ -51,6 +62,15 @@ public class Bomb {
 		this.map = map;
 		
 		spawnBomb();
+	}
+	
+	// used to check if a direction has already hit a brick
+	public boolean isIntInList(int[] list, int x) {
+		for (int i = 0; i < list.length; i++) {
+			if (x == list[i]) return true;
+		}
+		
+		return false;
 	}
 	
 	// when bomb is spawned, set position and timer
@@ -66,30 +86,21 @@ public class Bomb {
 			return;
 		}
 		bombTimer += delta;
-		System.out.println(bombTimer);
 	}
 	
 	// gets the tiles and checks if brick, if so, set it to a bomb explosion tile and delete brick
-	public void bombExplode(TiledMap map) {
-			for (int i = 0; i < BOMB_DIRECTIONS.length; i++) {
-				// get direction x and y and iterate through each one	
-				int nextX = bombX + BOMB_DIRECTIONS[i][0];
-				int nextY = bombY + BOMB_DIRECTIONS[i][1];
-				
-				if (isBrick(map, nextX, nextY)) {
-					breakBrick(map, nextX, nextY);
-					setBombTiles(map, nextX, nextY);
-				}
-			}
-		
-		bombTimerStart = false;
-		bombExplosion = true;
-	}
-	
 	public void bombExplode(TiledMap map, int radius) {
+		// create an array of length 4 and initialize numbers inside to 100
+		int[] selectedDirections = new int[]{ 100, 100, 100, 100 };
+		int count = 0;
+		
 		for (int k = 0; k <= radius; k++) {
 			for (int i = 0; i < BOMB_DIRECTIONS.length; i++) {
 				// get direction x and y and iterate through each one	
+				
+				// checks if int is in selected directions and if bomb isn't powered up
+				if (isIntInList(selectedDirections, i)) continue;
+				
 				int nextX = bombX + BOMB_DIRECTIONS[i][0];
 				int nextY = bombY + BOMB_DIRECTIONS[i][1];
 				
@@ -105,17 +116,28 @@ public class Bomb {
 					nextY += k;
 				}
 				
+				if (isWall(map, nextX, nextY)) {
+					selectedDirections[count++] = i;
+				}
+				
 				if (isBrick(map, nextX, nextY)) {
 					breakBrick(map, nextX, nextY);
-					setBombTiles(map, nextX, nextY);
+					
+					// if bomb power active, ignore selected directions and convert tiles to bomb explosion tiles
+					if (!bombPower) {
+						selectedDirections[count++] = i;
+					}
 				}
+				
+				//setBombTiles(map, nextX, nextY);
 			}
-			
-			bombTimerStart = false;
-			bombExplosion = true;
 		}
+		
+		bombTimerStart = false;
+		bombExplosion = true;
 	}
 	
+	// checks and returns if a tile is a brick
 	public boolean isBrick(TiledMap map, int x, int y) {
 		for (MapLayer layer : map.getLayers()) {
 			if (!(layer instanceof TiledMapTileLayer)) {
@@ -134,11 +156,32 @@ public class Bomb {
 		return false;
 	}
 	
+	// checks if tile is wall, if so, stop explosion in that direction
+	public boolean isWall(TiledMap map, int x, int y) {
+		for (MapLayer layer : map.getLayers()) {
+			if (!(layer instanceof TiledMapTileLayer)) {
+				continue;
+			}
+			
+			TiledMapTileLayer tileLayer = (TiledMapTileLayer) layer;
+			TiledMapTileLayer.Cell cell = tileLayer.getCell(x, y);
+			
+			// if layer is not floor and cell exists in that layer, return false
+			if (cell != null && cell.getTile() != null && tileLayer.getName().equals("Walls")) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	// sets brick to null, effectively deleting it
 	public void breakBrick(TiledMap map, int nextX, int nextY) {
 		TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Bricks");
 		layer.setCell(nextX, nextY, null);
 	}
 	
+	// used to set tiles to appropriate bomb tiles
 	public void setBombTiles(TiledMap map, int nextX, int nextY) {
 		// will be replaced with bomb explosion tiles
 		TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Walls");
