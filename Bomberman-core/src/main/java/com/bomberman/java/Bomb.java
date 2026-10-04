@@ -23,9 +23,16 @@ public class Bomb {
 	TiledMap map;
 	int bombX;
 	int bombY;
+	
 	boolean bombTimerStart;
 	float bombTimer;
 	int bombRadius;
+	
+	boolean bombExplosion;
+	float bombExplosionTimer;
+	// temporary layer for collision purposes
+	TiledMapTileLayer bombLayer;
+	
 	float bombWidth;
 	float bombHeight;
 	Texture texture;
@@ -33,7 +40,7 @@ public class Bomb {
 	
 	public Bomb(TiledMap map, int x, int y) {
 		bombTimer = 0;
-		bombRadius = 1;
+		bombRadius = 0;
 		bombX = x;
 		bombY = y;
 		bombWidth = 1;
@@ -55,25 +62,58 @@ public class Bomb {
 	// adds delta to bombTimer, when it reaches 3 or more, bombExplode is activated
 	public void bombTimerManager(float delta) {
 		if (bombTimer >= 3) {
-			bombExplode(map);
+			bombExplode(map, bombRadius);
 			return;
 		}
 		bombTimer += delta;
 		System.out.println(bombTimer);
 	}
 	
-	// for now, it simply sets timer to false, which then gets deleted in gamescreen
+	// gets the tiles and checks if brick, if so, set it to a bomb explosion tile and delete brick
 	public void bombExplode(TiledMap map) {
-		for (int i = 0; i < BOMB_DIRECTIONS.length; i++) {
-			// get direction x and y and iterate through each one
-			int nextX = bombX + BOMB_DIRECTIONS[i][0];
-			int nextY = bombY + BOMB_DIRECTIONS[i][1];
-			
-			if (isBrick(map, nextX, nextY)) {
-				breakBrick(map, nextX, nextY);
+			for (int i = 0; i < BOMB_DIRECTIONS.length; i++) {
+				// get direction x and y and iterate through each one	
+				int nextX = bombX + BOMB_DIRECTIONS[i][0];
+				int nextY = bombY + BOMB_DIRECTIONS[i][1];
+				
+				if (isBrick(map, nextX, nextY)) {
+					breakBrick(map, nextX, nextY);
+					setBombTiles(map, nextX, nextY);
+				}
 			}
-		}
+		
 		bombTimerStart = false;
+		bombExplosion = true;
+	}
+	
+	public void bombExplode(TiledMap map, int radius) {
+		for (int k = 0; k <= radius; k++) {
+			for (int i = 0; i < BOMB_DIRECTIONS.length; i++) {
+				// get direction x and y and iterate through each one	
+				int nextX = bombX + BOMB_DIRECTIONS[i][0];
+				int nextY = bombY + BOMB_DIRECTIONS[i][1];
+				
+				if (nextX < bombX) {
+					nextX -= k;
+				} else if (nextX > bombX) {
+					nextX += k;
+				}
+				
+				if (nextY < bombY) {
+					nextY -= k;
+				} else if(nextY > bombY) {
+					nextY += k;
+				}
+				
+				if (isBrick(map, nextX, nextY)) {
+					breakBrick(map, nextX, nextY);
+					setBombTiles(map, nextX, nextY);
+				}
+			}
+			
+			bombTimerStart = false;
+			bombExplosion = true;
+		}
 	}
 	
 	public boolean isBrick(TiledMap map, int x, int y) {
@@ -97,6 +137,25 @@ public class Bomb {
 	public void breakBrick(TiledMap map, int nextX, int nextY) {
 		TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Bricks");
 		layer.setCell(nextX, nextY, null);
+	}
+	
+	public void setBombTiles(TiledMap map, int nextX, int nextY) {
+		// will be replaced with bomb explosion tiles
+		TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Walls");
+		TiledMapTileLayer.Cell cell;
+		
+		// if nextY is the direction, the tile selected will be a vertical explosion tile
+		if (nextY > 0 || nextY < 0) {
+			cell = (TiledMapTileLayer.Cell) layer.getCell(0, 0);
+		} else if (nextX > 0 || nextX < 0) {
+			// if nextX is the direction of the explosion, it will be a horizontal explosion tile
+			cell = (TiledMapTileLayer.Cell) layer.getCell(0, 0);
+		} else {
+			// if nextX and nextY are (0, 0), it will be the center explosion tile
+			cell = (TiledMapTileLayer.Cell) layer.getCell(0, 0);
+		}
+		
+		layer.setCell(nextX, nextY, cell);
 	}
 	
 	public void draw(SpriteBatch batch) {

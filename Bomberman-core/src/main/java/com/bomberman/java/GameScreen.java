@@ -70,6 +70,7 @@ public class GameScreen implements Screen{
 			bomb.logic(delta);
 			
 			if (!bomb.bombTimerStart) {
+				player1.bombStorage += 1;
 				bombs.removeIndex(i);
 			}
 		}
@@ -80,8 +81,10 @@ public class GameScreen implements Screen{
 	public void input(float delta) {
 		// anything relating to input goes here
 		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            Bomb bomb = new Bomb(map, (int)(player1.x), (int)(player1.y));
+			if (player1.bombStorage == 0) return;
+            Bomb bomb = new Bomb(map, Math.round(player1.x), Math.round(player1.y));
             bombs.add(bomb);
+            player1.bombStorage -= 1;
 		}
 	}
 

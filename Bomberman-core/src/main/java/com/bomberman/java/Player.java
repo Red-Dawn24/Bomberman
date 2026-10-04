@@ -32,10 +32,12 @@ public class Player{
     float speed = 3;
     boolean moving;
     String lastDirection = "";
+    int bombStorage;
     
     public Player(int x, int y){
         this.x = x;
         this.y = y;
+        bombStorage = 1;
         // we need to state that the animations would loop
         idleRight.setPlayMode(Animation.PlayMode.LOOP);
         idleLeft.setPlayMode(Animation.PlayMode.LOOP);
