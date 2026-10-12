@@ -19,7 +19,7 @@ public class GameScreen implements Screen{
 	float unitScale;
 	Texture ghostTexture;
 	Enemy ghost;
-	Player player1 = new Player(0, 0);
+	Player player1 = new Player(19, 1);
 	Array<Bomb> bombs;
 	
 	public GameScreen(final Bomberman game) {
@@ -75,7 +75,7 @@ public class GameScreen implements Screen{
 			}
 		}
 		ghost.logic(delta, map);
-		player1.update(delta);
+		player1.update(delta, map);
 	}
 	
 	public void input(float delta) {
