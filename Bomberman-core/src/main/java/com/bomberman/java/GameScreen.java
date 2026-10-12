@@ -19,7 +19,7 @@ public class GameScreen implements Screen{
 	float unitScale;
 	Texture ghostTexture;
 	Enemy ghost;
-	Player player1 = new Player(19, 1);
+	Player player1 = new Player(18, 1);
 	Array<Bomb> bombs;
 	
 	public GameScreen(final Bomberman game) {
